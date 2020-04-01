@@ -34,12 +34,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-svc
+  name: websvc
 spec:
-  type: NodePort
+  loadBalancerIP: 172.31.27.253
+  type: LoadBalancer
   selector:
     app: be
   ports:
     - protocol: TCP
-      port: 8000
-      nodePort: 30001
+      port: 80
+      targetPort: 8000
+      #nodePort: 30001
