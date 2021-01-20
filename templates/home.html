@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<head>
+
+<link rel="stylesheet" type="text/css" href="{% static 'packages/core/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/daygrid/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/timegrid/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/list/main.css' %}">
+
+<script src="{% static 'packages/core/main.js' %}"></script>
+<script src="{% static 'packages/interaction/main.js' %}"></script>
+<script src="{% static 'packages/daygrid/main.js' %}"></script>
+<script src="{% static 'packages/timegrid/main.js' %}"></script>
+<script src="{% static 'packages/list/main.js' %}"></script>
+<script src="{% static 'nightwork/jquery-3.4.1.min.js' %}"></script>
+
+</head>
+<style>
+
+  #calendar-container {
+    position: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .data {
+      display: None;
+  }
+
+  .btn-primary {
+    background: #337ab7;
+    border-color: #2e6da4;
+  }
+
+</style>
+
+<legend class="border-bottom mb-2">NRM Night Job Schedule</legend>
+    <div class="row">
+        <p style="background-color: #ffaf8c; border-radius:10px 0px 0px 10px" align="center" class="col-md-3 mb-2">NFV</p>
+        <p style="background-color: #a2d9e0" align="center" class="col-md-3 mb-2">Private Cloud</p>
+        <p style="background-color: #a4e6a1" align="center" class="col-md-3 mb-2">Smartcare</p>
+        <p style="background-color: #ebe47a; border-radius:0px 10px 10px 0px" align="center" class="col-md-3 mb-2">Other</p>
+    </div>
+    <div class="data">
+        <div class='user' value='{{ user.get_username }}'>{{ user.get_username }}</div>
+    {% for operation in operations %}
+        <div class='op' id='{{operation.id}}'> 
+        <div class='id' value='{{ operation.id }}'>{{ operation.id }}</div>
+        <div class='name' value='{{ operation.name }}'>{{ operation.name }}</div>
+        <div class='phone' value='{{ operation.phone }}'>{{ operation.phone }}</div>
+        <div class='domain' value='{{ operation.domain }}'>{{ operation.domain }}</div>
+        <div class='category' value='{{ operation.category }}'>{{ operation.category }}</div>
+        <div class='location' value='{{ operation.location }}'>{{ operation.location }}</div>
+        <div class='reason' value='{{ operation.reason }}'>{{ operation.reason }}</div>
+        <div class='reason_type' value='{{ operation.reason_type }}'>{{ operation.reason_type }}</div>
+        <div class='impact' value='{{ operation.impact }}'>{{ operation.impact }}</div>
+        <div class='remarks' value='{{ operation.remarks }}'>{{ operation.remarks }}</div>
+        <div class='vendor' value='{{ operation.vendor }}'>{{ operation.vendor }}</div>
+        <div class='vendor_phone' value='{{ operation.vendor_phone }}'>{{ operation.vendor_phone }}</div>
+        <div class='mop' value='{{ operation.mop }}'>{{ operation.mop }}</div>
+        <div class='subject' value='{{ operation.subject }}'>{{ operation.subject }}</div>
+        <div class='startdate' value='{{ operation.startdate|date:"F d, Y" }}'>{{ operation.startdate|date:"Y-m-d" }}</div>
+        <div class='starttime' value='{{ operation.starttime}}'>{{ operation.starttime|date:"H:i:s"}}</div>
+        <div class='enddate' value='{{ operation.enddate|date:"F d, Y" }}'>{{ operation.enddate|date:"Y-m-d" }}</div>
+        <div class='endtime' value='{{ operation.endtime}}'>{{ operation.endtime|date:"H:i:s"}}</div>
+        </div>
+    {% endfor %}
+    </div>
+    <div id='calendar-container'>
+    <div id='calendar'></div>
+  </div>
+
+  <script>
+        var events = []
+        var domain2color = {
+        "NFV": "#ffaf8c",
+        "Private Cloud": "#a2d9e0",
+        "Smartcare": "#a4e6a1",
+        "Other": "#ebe47a" 
+        }
+      var user = $('.user')[0].innerHTML
+      var element = $(".op").each(function(i, obj) {
+          var id      = obj.getElementsByClassName("id")[0].innerHTML
+          var name      = obj.getElementsByClassName("name")[0].innerHTML
+          var phone     = obj.getElementsByClassName("phone")[0].innerHTML
+          var domain    = obj.getElementsByClassName("domain")[0].innerHTML
+          var category  = obj.getElementsByClassName("category")[0].innerHTML
+          var subject   = obj.getElementsByClassName("subject")[0].innerHTML
+          var location  = obj.getElementsByClassName("location")[0].innerHTML
+          var reason_type   = obj.getElementsByClassName("reason_type")[0].innerHTML
+          var reason    = obj.getElementsByClassName("reason")[0].innerHTML
+          var impact    = obj.getElementsByClassName("impact")[0].innerHTML
+          var remarks   = obj.getElementsByClassName("remarks")[0].innerHTML
+          var vendor    = obj.getElementsByClassName("vendor")[0].innerHTML
+          var vendor_phone   = obj.getElementsByClassName("vendor_phone")[0].innerHTML
+          var mop       = obj.getElementsByClassName("mop")[0].innerHTML
+          var startdate = obj.getElementsByClassName("startdate")[0].innerHTML
+          var starttime = obj.getElementsByClassName("starttime")[0].innerHTML
+          var enddate   = obj.getElementsByClassName("enddate")[0].innerHTML
+          var endtime   = obj.getElementsByClassName("endtime")[0].innerHTML
+
+          events.push({
+            "title": name + " - " + subject,
+            "id"   : id,
+            "name" : name,
+            "phone": phone,
+            "domain" : domain,
+            "category": category,
+            "startdate": startdate,
+            "starttime": starttime,
+            "enddate": enddate,
+            "endtime": endtime,
+            "location": location,
+            "subject" : subject,
+            "reason_type": reason_type,
+            "reason": reason,
+            "impact": impact,
+            "remarks": remarks,
+            "vendor": vendor,
+            "vendor_phone": vendor_phone,
+            "mop": mop,
+            "start": startdate, 
+            "end": enddate,
+            "color": domain2color[domain]})
+    });
+
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list'],
+      height: 750,
+      header: {
+        left: 'prev, today',
+        center: 'title',
+        right: 'next'
+      },
+      defaultView: 'dayGridMonth',
+      defaultDate: Date.now(),
+      allDayDefault: true,
+      navLinks: false,
+      editable: false,
+      fixedWeekCount: false,
+      eventLimit: true, 
+      events: events,
+      eventClick:  function(event) {
+      if (user) {
+        $('#fullCalModal').modal();
+        $('#form-id').val(event.event.id);
+        $('#form-name').val(event.event.extendedProps.name);
+        $('#form-phone').val(event.event.extendedProps.phone);
+        $('#form-domain').val(event.event.extendedProps.domain);
+        $('#form-category').val(event.event.extendedProps.category);
+        $('#form-startdate').val(event.event.extendedProps.startdate);
+        $('#form-starttime').val(event.event.extendedProps.starttime);
+        $('#form-enddate').val(event.event.extendedProps.enddate);
+        $('#form-endtime').val(event.event.extendedProps.endtime);
+        $('#form-location').val(event.event.extendedProps.location);
+        $('#form-subject').val(event.event.extendedProps.subject);
+        $('#form-reason_type').val(event.event.extendedProps.reason_type);
+        $('#form-reason').val(event.event.extendedProps.reason);
+        $('#form-impact').val(event.event.extendedProps.impact);
+        $('#form-remarks').val(event.event.extendedProps.remarks);
+        $('#form-vendor').val(event.event.extendedProps.vendor);
+        $('#form-vendor_phone').val(event.event.extendedProps.vendor_phone);
+        $('#form-mop').html(event.event.extendedProps.mop);
+      } else {
+        alert("Please login to edit operation")
+      }
+      },
+      dayRender: function(info) {
+        let colDate = new Date(info.date);
+        let start1 = new Date('2020-01-21'); // start = real_start -1, start & end = frozen period
+        let end1 = new Date('2020-02-02');  
+        let start2 = new Date('2019-12-20');
+        let end2 = new Date('2020-01-01');
+        let start3 = new Date('2019-09-28');
+        let end3 = new Date('2019-10-07');
+        let start4 = new Date('2019-08-05');
+        let end4 = new Date('2019-08-10');
+        let start5 = new Date('2019-06-29');
+        let end5 = new Date('2019-07-02');
+        let start6 = new Date('2019-04-23');
+        let end6 = new Date('2019-04-30');
+        let start7 = new Date('2019-04-30');
+        let end7 = new Date('2019-05-05');
+        let start8 = new Date('2019-03-19');
+        let end8 = new Date('2019-03-22');
+        let start9 = new Date('2020-03-30');
+        let end9 = new Date('2020-04-02');
+        let start10 = new Date('2020-04-29');
+        let end10 = new Date('2020-05-03');
+        let start11 = new Date('2020-05-19');
+        let end11 = new Date('2020-05-31');
+        let start12 = new Date('2020-06-29');
+        let end12 = new Date('2020-07-01');
+        let start13 = new Date('2020-09-30');
+        let end13 = new Date('2020-10-04');
+        let start14 = new Date('2020-12-20');
+        let end14 = new Date('2021-01-02');
+        
+        let cmhkhalfday = [
+          new Date('2019-02-04'),
+          new Date('2019-09-13'),
+          new Date('2019-12-24'),
+          new Date('2019-12-31'),
+          new Date('2020-12-21'),
+          new Date('2020-12-24'),
+          new Date('2020-12-31'),
+          new Date('2021-02-11'),
+        ];
+        let newyear = [
+          new Date('2019-01-01'),
+        ];
+        let chinesenewyear = [
+          new Date('2019-02-05'),
+          new Date('2019-02-06'),
+          new Date('2019-02-07'),
+          new Date('2020-01-25'),
+          new Date('2020-01-27'),
+          new Date('2020-01-28'),
+          new Date('2021-02-12'),
+          new Date('2021-02-13'),
+          new Date('2021-02-14'),
+          new Date('2021-02-15'),
+        ];
+        let chingming = [
+          new Date('2019-04-05'),
+          new Date('2020-04-04'),
+        ];
+        let easter = [
+          new Date('2019-04-19'),
+          new Date('2019-04-22'),
+          new Date('2020-04-10'),
+          new Date('2020-04-13'),
+        ];
+        let buddha = [
+          new Date('2019-05-13'),
+          new Date('2020-04-30'),
+        ];
+        let labor = [
+          new Date('2020-05-01'),
+        ];
+        let dragon = [
+          new Date('2019-06-07'),
+          new Date('2020-06-25'),
+        ];
+        let hksar = [
+          new Date('2020-07-01'),
+        ];
+        let china = [
+          new Date('2020-10-01'),
+        ];
+        let midautumn = [
+          new Date('2019-09-14'),
+          new Date('2020-10-02'),
+        ];
+        let chungyeung = [
+          new Date('2019-10-07'),
+          new Date('2020-10-26'),
+        ];
+        let christmas = [
+          new Date('2019-12-25'),
+          new Date('2019-12-26'),
+          new Date('2020-12-25'),
+        ];
+
+        // frozen must be in descending order
+        if ((colDate <= end14 && colDate >= start14 ) || (colDate <= end13 && colDate >= start13 ) ||
+        (colDate <= end12 && colDate >= start12 ) || (colDate <= end11 && colDate >= start11 ) ||(colDate <= end10 && colDate >= start10 ) || (colDate <= end9 && colDate >= start9 ) || (colDate <= end8 && colDate >= start8 ) 
+        || (colDate <= end7 && colDate >= start7 ) || (colDate <= end6 && colDate >= start6 )
+        || (colDate <= end5 && colDate >= start5 ) || (colDate <= end4 && colDate >= start4 ) || (colDate <= end3 && colDate >= start3 )
+        || (colDate <= end2 && colDate >= start2 ) || (colDate <= end1 && colDate >= start1 )
+        || $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").hasClass("fc-holiday"))
+            {
+              info.el.innerHTML = '🔒 <b>Frozen</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").addClass("fc-frozen")
+            }
+
+        cmhkhalfday.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '<img src="{% static 'nightwork/cmhk_small.png' %}"><b>CMHK Half Day</b>';
+            }
+        });
+        newyear.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '1️⃣ <b>New Year&#39;s Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        chinesenewyear.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🧧 <b>Chinese New Year</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        chingming.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🧹 <b>Ching Ming</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        easter.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🥚 <b>Easter</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        buddha.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🤚 <b>Buddha Birthday</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        labor.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '👷 <b>Labor Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        dragon.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🚣 <b>Dragon Boat</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        hksar.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '<img src="{% static 'nightwork/hongkong.png' %}"><b> HKSAR Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        china.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '<img src="{% static 'nightwork/china.png' %}"><b> National Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        midautumn.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🌕 <b>Mid Autumn</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        chungyeung.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '💐 <b>Chung Yeung</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        christmas.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🎅 <b>Christmas</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+      },
+    });
+    calendar.render();
+
+  </script>
+
+ <div id="fullCalModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header"><meta name="c-token" content="{!! csrf_token() !!}" />
+        <h4 class="modal-title">Edit Operation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form class="form-group" method='POST' enctype='multipart/form-data'>{% csrf_token %}
+            <div class="row">
+              <div class="col-md-4 mb-4">Name</div>
+              <input type="hidden" class="col-md-5 mb-3" id="form-id" name="form-id"></input>
+              <input type="text" class="col-md-5 mb-3" id="form-name" name="form-name"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-4">Phone</div>
+              <input type="text" class="col-md-5 mb-3" id="form-phone" name="form-phone"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Domain</div>  
+              <select class="col-md-3 mb-3" id="form-domain" name="form-domain">
+                <option value="NFV">NFV</option>
+                <option value="Private Cloud">Private Cloud</option>
+                <option value="Smartcare">Smartcare</option>
+                <option value="Other">Other</option>
+              </select>
+              <div class="col-md-2 mb-4">Category</div>
+              <select class="col-md-3 mb-3" id="form-category" name="form-category">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Start Date</div>
+              <input type="date" class="col-md-3 mb-4" id="form-startdate" name="form-startdate"></input>
+              <div class="col-md-2 mb-4">End Date</div>
+              <input type="date" class="col-md-3 mb-3" id="form-enddate" name="form-enddate"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Start Time</div>
+              <input type="time" class="col-md-3 mb-3" id="form-starttime" name="form-starttime"></input>
+              <div class="col-md-2 mb-4">End Time</div>
+              <input type="time" class="col-md-3 mb-3" id="form-endtime" name="form-endtime"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Location</div>
+              <select class="col-md-3 mb-3" id="form-location" name="form-location">
+                <option value="MITA">MITA</option>
+                <option value="GNC">GNC</option>
+                <option value="KCC">KCC</option>
+                <option value="Remote">Remote</option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Subject</div>
+              <input type="text" class="col-md-9 mb-3" id="form-subject" name="form-subject"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Reason Type</div>
+              <select class="col-md-3 mb-3" id="form-reason_type" name="form-reason_type">
+                <option value="Configuration Change">Configuration Change</option>
+                <option value="Preventive Maintenance">Preventive Maintenance</option>
+                <option value="H/W upgrade">H/W upgrade</option>
+                <option value="S/W upgrade">S/W upgrade</option>
+                <option value="Expansion">Expansion</option>
+                <option value="Fault Solution">Fault Solution</option>
+                <option value="Partner Network Maintenance">Partner Network Maintenance</option>
+                <option value="Facility Maintenance">Facility Maintenance</option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Reason</div>
+              <input type="text" class="col-md-9 mb-3" id="form-reason" name="form-reason"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Impact</div>
+              <input type="text" class="col-md-9 mb-3" id="form-impact" name="form-impact"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Remarks</div>
+              <input type="text" class="col-md-5 mb-3" id="form-remarks" name="form-remarks"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-4">Vendor Staff Name (Optional)</div>
+              <input type="text" class="col-md-5 mb-3" id="form-vendor" name="form-vendor"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-4">Vendor Phone (Optional)</div>
+              <input type="text" class="col-md-5 mb-3" id="form-vendor_phone" name="form-vendor_phone"></input>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <input type='submit' class="btn btn-primary" value='Save Changes'/>
+      </form>
+    </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

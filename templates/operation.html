@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content%}
+<head>
+
+<link rel="stylesheet" type="text/css" href="{% static 'packages/core/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/daygrid/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/timegrid/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/list/main.css' %}">
+
+<script src="{% static 'packages/core/main.js' %}"></script>
+<script src="{% static 'packages/interaction/main.js' %}"></script>
+<script src="{% static 'packages/daygrid/main.js' %}"></script>
+<script src="{% static 'packages/timegrid/main.js' %}"></script>
+<script src="{% static 'packages/list/main.js' %}"></script>
+<script src="{% static 'nightwork/jquery-3.4.1.min.js' %}"></script>
+</head>
+
+<legend class="border-bottom mb-8">Operation Details</legend>
+
+ <div id="fullCalModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+    <form class="form-group" method='POST' enctype='multipart/form-data'>{% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 mb-4">Name</div>
+        <div class="col-md-6 mb-4">{{ form.name }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Phone</div>
+        <div class="col-md-6 mb-4">{{ form.phone }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 mb-4">Domain</div>       
+        <div class="col-md-4 mb-4">{{ form.domain }}</div>
+        <div class="col-md-2 mb-4">Category</div>
+        <div class="col-md-3 mb-4">{{ form.category }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 mb-4">Start Date</div>
+        <div class="col-md-4 mb-4">{{ form.startdate }}</div>
+        <div class="col-md-2 mb-4">End Date</div>
+        <div class="col-md-3 mb-4">{{ form.enddate }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 mb-4">Start Time</div>
+        <div class="col-md-4 mb-4">{{ form.starttime }}</div>
+        <div class="col-md-2 mb-4">End Time</div>
+        <div class="col-md-3 mb-4">{{ form.endtime }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Location</div>
+        <div class="col-md-6 mb-4">{{ form.location }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Subject</div>
+        <div class="col-md-6 mb-4">{{ form.subject }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Reason Type</div>
+        <div class="col-md-6 mb-4">{{ form.reason_type }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Reason</div>
+        <div class="col-md-6 mb-4">{{ form.reason }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Impact</div>
+        <div class="col-md-6 mb-4">{{ form.impact }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Remarks</div>
+        <div class="col-md-6 mb-4">{{ form.remarks }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Vendor Staff Name (Optional)</div>
+        <div class="col-md-6 mb-4">{{ form.vendor }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Vendor Phone (Optional)</div>
+        <div class="col-md-6 mb-4">{{ form.vendor_phone }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">MOP Upload</div>
+        <div class="col-md-6 mb-4">{{ form.mop }}</div>
+    </div>
+    <div class="row">
+    <div class="col text-center"> 
+        <input type='submit' class="btn btn-secondary" value='Create' />
+    </div>
+    </div>
+    </form>
+    </div>
+    </div>
+    </div>
+    
+<script>
+        $(document).ready(function() {
+             $('#fullCalModal').modal();
+        });
+    $("#id_phone").val("92049358");
+    $("#id_name").change(function(){
+        if ($('#id_name option:selected').text() == "Teddy Kwong"){
+            $("#id_phone").val("92044001");
+        } else if ($('#id_name option:selected').text() == "Matt So"){
+            $("#id_phone").val("92047569");
+        } else if ($('#id_name option:selected').text() == "Nancy Nie"){
+            $("#id_phone").val("92049328");
+        } else if ($('#id_name option:selected').text() == "Leo Liu"){
+            $("#id_phone").val("68478592");
+        } else if ($('#id_name option:selected').text() == "Stephen Cheung"){
+            $("#id_phone").val("63592507");
+        } else if ($('#id_name option:selected').text() == "Roger Liu"){
+            $("#id_phone").val("92049358");
+        }
+        
+    });
+</script>
+
+{% endblock %}

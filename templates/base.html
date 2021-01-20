@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    
+    <link rel="stylesheet" href="{% static 'nightwork/bootstrap.min.css' %}" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'nightwork/main.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'nightwork/cloud2.png' %}"/>
+    <script src="{% static 'nightwork/jquery-3.4.1.min.js' %}"></script>
+
+    {% if title %}
+        <title>NRM Schedule - {{ title }}</title>
+    {% else %}
+        <title>NRM Schedule</title>
+    {% endif %}
+</head>
+<body>
+    <header class="site-header">
+      <nav class="navbar-expand-md navbar-dark bg-cmhk fixed-top">
+        <div class=" header-container">
+            {% if user.is_authenticated %}
+              <a class="navbar-brand mr-4" href="{% url 'home' %}"><img style="height:45px;" hspace="20" src="{% static 'nightwork/cloud.png' %}">NRM Schedule</a>
+            {% else %}
+              <a class="navbar-brand mr-4" href="{% url 'home' %}"><img style="height:45px;" hspace="20" src="{% static 'nightwork/cloud.png' %}">NRM Schedule</a>
+            {% endif %}
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+              {% if user.is_authenticated %}
+              <a class="nav-item nav-link" href="{% url 'home' %}"><img src="{% static 'nightwork/home.png' %}"/> Home</a>
+              {% else %}
+              <a class="nav-item nav-link" href="{% url 'home' %}"><img src="{% static 'nightwork/home.png' %}"/> Home</a>
+              {% endif %}
+              <a class="nav-item nav-link" href="{% url 'summary' %}"><img src="{% static 'nightwork/chart.png' %}"/> Summary</a>
+            </div>
+            <div class="navbar-nav">
+              {% if user.is_authenticated %}
+                <a class="nav-item nav-link"><img src="{% static 'nightwork/user.png' %}"/> {{ user.username }}</a>
+                <a class="nav-item nav-link" "href=javascript:;" id="operation"><img src="{% static 'nightwork/create.png' %}"/> New Operation</a>
+                <a class="nav-item nav-link" href="{% url 'history' %}"><img src="{% static 'nightwork/history.png' %}"/> History</a>
+                <a class="nav-item nav-link" href="{% url 'logout' %}"><img src="{% static 'nightwork/logout.png' %}"/> Logout</a>
+              {% else %}
+                <a class="nav-item nav-link" href="{% url 'login' %}"><img src="{% static 'nightwork/login.png' %}"/> Login</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main role="main" class="body-container">
+
+        <div class="col-md-12">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{message.tags}}">
+                        {{ message}}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+
+ <div id="fullCalModal2" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header"><meta name="c-token" content="{!! csrf_token() !!}" />
+        <h4 class="modal-title">Create Operation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form class="form-group" method='POST' enctype='multipart/form-data'>{% csrf_token %}
+          <div class="row">
+              <div class="col-md-4 mb-4">Name</div>
+              <div class="col-md-6 mb-4">{{ form.name }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Phone</div>
+              <div class="col-md-6 mb-4">{{ form.phone }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-2 mb-4">Domain</div>       
+              <div class="col-md-4 mb-4">{{ form.domain }}</div>
+              <div class="col-md-2 mb-4">Category</div>
+              <div class="col-md-3 mb-4">{{ form.category }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-2 mb-4">Start Date</div>
+              <div class="col-md-4 mb-4">{{ form.startdate }}</div>
+              <div class="col-md-2 mb-4">End Date</div>
+              <div class="col-md-3 mb-4">{{ form.enddate }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-2 mb-4">Start Time</div>
+              <div class="col-md-4 mb-4">{{ form.starttime }}</div>
+              <div class="col-md-2 mb-4">End Time</div>
+              <div class="col-md-3 mb-4">{{ form.endtime }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Location</div>
+              <div class="col-md-6 mb-4">{{ form.location }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Subject</div>
+              <div class="col-md-6 mb-4">{{ form.subject }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Reason Type</div>
+              <div class="col-md-6 mb-4">{{ form.reason_type }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Reason</div>
+              <div class="col-md-6 mb-4">{{ form.reason }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Impact</div>
+              <div class="col-md-6 mb-4">{{ form.impact }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Remarks</div>
+              <div class="col-md-6 mb-4">{{ form.remarks }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Vendor Staff Name (Optional)</div>
+              <div class="col-md-6 mb-4">{{ form.vendor }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">Vendor Phone (Optional)</div>
+              <div class="col-md-6 mb-4">{{ form.vendor_phone }}</div>
+          </div>
+          <div class="row">
+              <div class="col-md-4 mb-4">MOP Upload</div>
+              <div class="col-md-6 mb-4">{{ form.mop }}</div>
+          </div>
+    <div class="row">
+    <div class="col text-center"> 
+        <input type='submit' class="btn btn-secondary" value='Create' />
+    </div>
+    </div>
+    </form>
+    </div>
+    </div>
+    </div>
+    <script src="{% static 'nightwork/popper.min.js' %}" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="{% static 'nightwork/bootstrap2.min.js' %}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+$('#operation').click(function(event){
+  $('#fullCalModal2').modal();
+ });
+    $("#id_phone").val("92049358");
+    $("#id_name").change(function(){
+        if ($('#id_name option:selected').text() == "Teddy Kwong"){
+            $("#id_phone").val("92044001");
+        } else if ($('#id_name option:selected').text() == "Matt So"){
+            $("#id_phone").val("92047569");
+        } else if ($('#id_name option:selected').text() == "Nancy Nie"){
+            $("#id_phone").val("92049328");
+        } else if ($('#id_name option:selected').text() == "Leo Liu"){
+            $("#id_phone").val("68478592");
+        } else if ($('#id_name option:selected').text() == "Stephen Cheung"){
+            $("#id_phone").val("63592507");
+        } else if ($('#id_name option:selected').text() == "Roger Liu"){
+            $("#id_phone").val("92049358");
+        } else if ($('#id_name option:selected').text() == "Billy Chan"){
+            $("#id_phone").val("68478853");
+        }});
+</script>
+</body>
+</html>

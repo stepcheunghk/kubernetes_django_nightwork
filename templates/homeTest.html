@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<head>
+
+<link rel="stylesheet" type="text/css" href="{% static 'packages/core/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/daygrid/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/timegrid/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'packages/list/main.css' %}">
+
+<script src="{% static 'packages/core/main.js' %}"></script>
+<script src="{% static 'packages/interaction/main.js' %}"></script>
+<script src="{% static 'packages/daygrid/main.js' %}"></script>
+<script src="{% static 'packages/timegrid/main.js' %}"></script>
+<script src="{% static 'packages/list/main.js' %}"></script>
+<script src="{% static 'nightwork/jquery-3.4.1.min.js' %}"></script>
+
+</head>
+<style>
+
+  #calendar-container {
+    position: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .data {
+      display: None;
+  }
+
+  .btn-primary {
+    background: #337ab7;
+    border-color: #2e6da4;
+  }
+
+</style>
+
+<legend class="border-bottom mb-2">NRM Night Job Schedule</legend>
+    <div class="row">
+        <p style="background-color: #ffaf8c; border-radius:10px 0px 0px 10px" align="center" class="col-md-3 mb-2">NFV</p>
+        <p style="background-color: #a2d9e0" align="center" class="col-md-3 mb-2">Private Cloud</p>
+        <p style="background-color: #a4e6a1" align="center" class="col-md-3 mb-2">Smartcare</p>
+        <p style="background-color: #ebe47a; border-radius:0px 10px 10px 0px" align="center" class="col-md-3 mb-2">Other</p>
+    </div>
+    <div class="data">
+        <div class='user' value='{{ user.get_username }}'>{{ user.get_username }}</div>
+    {% for op in ops %}
+        <div class='op' id='{{form.id}}'> 
+        <div class='id' value='{{ op.id }}'>{{ op.id }}</div>
+        <div class='name' value='{{ op.name }}'>{{ op.name }}</div>
+        <div class='phone' value='{{ op.phone }}'>{{ op.phone }}</div>
+        <div class='domain' value='{{ op.domain }}'>{{ op.domain }}</div>
+        <div class='category' value='{{ op.category }}'>{{ op.category }}</div>
+        <div class='location' value='{{ op.location }}'>{{ op.location }}</div>
+        <div class='reason' value='{{ op.reason }}'>{{ op.reason }}</div>
+        <div class='reason_type' value='{{ op.reason_type }}'>{{ op.reason_type }}</div>
+        <div class='impact' value='{{ op.impact }}'>{{ op.impact }}</div>
+        <div class='remarks' value='{{ op.remarks }}'>{{ op.remarks }}</div>
+        <div class='vendor' value='{{ op.vendor }}'>{{ op.vendor }}</div>
+        <div class='vendor_phone' value='{{ op.vendor_phone }}'>{{ op.vendor_phone }}</div>
+        <div class='mop' value='{{ op.mop }}'>{{ op.mop }}</div>
+        <div class='subject' value='{{ op.subject }}'>{{ op.subject }}</div>
+        <div class='startdate' value='{{ op.startdate|date:"F d, Y" }}'>{{ op.startdate|date:"Y-m-d" }}</div>
+        <div class='starttime' value='{{ op.starttime}}'>{{ op.starttime|date:"H:i:s"}}</div>
+        <div class='enddate' value='{{ op.enddate|date:"F d, Y" }}'>{{ op.enddate|date:"Y-m-d" }}</div>
+        <div class='endtime' value='{{ op.endtime}}'>{{ op.endtime|date:"H:i:s"}}</div>
+        </div>
+    {% endfor %}
+    {% for date in dates %}
+        <div class='sd' id='{{date.id}}'> 
+        <div class='specialdatename' value='{{ date.name }}'>{{ date.name }}</div>
+        <div class='specialdatestart' value='{{ date.startdate }}'>{{ date.startdate }}</div>
+        <div class='specialdateend' value='{{ date.enddate }}'>{{ date.enddate }}</div>
+        </div>
+    {% endfor %}
+    </div>
+    <div id='calendar-container'>
+    <div id='calendar'></div>
+  </div>
+
+  <script>
+        var events = []
+        var specialdates = []
+        var domain2color = {
+        "NFV": "#ffaf8c",
+        "Private Cloud": "#a2d9e0",
+        "Smartcare": "#a4e6a1",
+        "Other": "#ebe47a" 
+        }
+      var user = $('.user')[0].innerHTML
+      var element_date = $(".sd").each(function(i, obj) {
+          var specialdatename = obj.getElementsByClassName("specialdatename")[0].innerHTML
+          var specialdatestart = obj.getElementsByClassName("specialdatestart")[0].innerHTML
+          var specialdateend = obj.getElementsByClassName("specialdateend")[0].innerHTML
+          specialdates.push({
+            "specialdatename": specialdatename,
+            "specialdatestart": specialdatestart,
+            "specialdateend": specialdateend})
+          });
+
+      var element_op = $(".op").each(function(i, obj) {
+          var id      = obj.getElementsByClassName("id")[0].innerHTML
+          var name      = obj.getElementsByClassName("name")[0].innerHTML
+          var phone     = obj.getElementsByClassName("phone")[0].innerHTML
+          var domain    = obj.getElementsByClassName("domain")[0].innerHTML
+          var category  = obj.getElementsByClassName("category")[0].innerHTML
+          var subject   = obj.getElementsByClassName("subject")[0].innerHTML
+          var location  = obj.getElementsByClassName("location")[0].innerHTML
+          var reason_type   = obj.getElementsByClassName("reason_type")[0].innerHTML
+          var reason    = obj.getElementsByClassName("reason")[0].innerHTML
+          var impact    = obj.getElementsByClassName("impact")[0].innerHTML
+          var remarks   = obj.getElementsByClassName("remarks")[0].innerHTML
+          var vendor    = obj.getElementsByClassName("vendor")[0].innerHTML
+          var vendor_phone   = obj.getElementsByClassName("vendor_phone")[0].innerHTML
+          var mop       = obj.getElementsByClassName("mop")[0].innerHTML
+          var startdate = obj.getElementsByClassName("startdate")[0].innerHTML
+          var starttime = obj.getElementsByClassName("starttime")[0].innerHTML
+          var enddate   = obj.getElementsByClassName("enddate")[0].innerHTML
+          var endtime   = obj.getElementsByClassName("endtime")[0].innerHTML
+          events.push({
+            "title": name + " - " + subject,
+            "id"   : id,
+            "name" : name,
+            "phone": phone,
+            "domain" : domain,
+            "category": category,
+            "startdate": startdate,
+            "starttime": starttime,
+            "enddate": enddate,
+            "endtime": endtime,
+            "location": location,
+            "subject" : subject,
+            "reason_type": reason_type,
+            "reason": reason,
+            "impact": impact,
+            "remarks": remarks,
+            "vendor": vendor,
+            "vendor_phone": vendor_phone,
+            "mop": mop,
+            "start": startdate, 
+            "end": enddate,
+            "color": domain2color[domain]})
+          });
+
+    var specialdates = specialdates;
+    for (date in specialdates){
+      var listDate = [];
+      var startDate = new Date(specialdates[date]['specialdatestart']);
+      var endDate = new Date(specialdates[date]['specialdateend']);
+      var currentDate = startDate;
+      
+      while (currentDate <= endDate){
+        listDate.push(new Date(currentDate));
+        currentDate.setDate(new Date(currentDate.getDate()+1));
+      };
+      specialdates[date]['specialdatelist'] = listDate;
+    }
+
+    var specialdates = specialdates.reduce(function(o, cur) {
+      var occurs = o.reduce(function(n, item, i) {
+        return (item.specialdatename === cur.specialdatename) ? i : n;
+        }, -1);
+        if (occurs >= 0) {
+          o[occurs].specialdatelist = o[occurs].specialdatelist.concat(cur.specialdatelist);
+        } else {
+          var obj = {
+            specialdatename: cur.specialdatename,
+            specialdatelist: [cur.specialdatelist].flat(Infinity)
+          };
+          o = o.concat([obj]);
+        }
+        return o;
+    }, []);
+
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list'],
+      height: 750,
+      header: {
+        left: 'prev, today',
+        center: 'title',
+        right: 'next'
+      },
+      defaultView: 'dayGridMonth',
+      defaultDate: Date.now(),
+      allDayDefault: true,
+      navLinks: false,
+      editable: false,
+      fixedWeekCount: false,
+      eventLimit: true, 
+      events: events,
+      specialdates: specialdates,
+      eventClick:  function(event) {
+      if (user) {
+        $('#fullCalModal').modal();
+        $('#form-id').val(event.event.id);
+        $('#form-name').val(event.event.extendedProps.name);
+        $('#form-phone').val(event.event.extendedProps.phone);
+        $('#form-domain').val(event.event.extendedProps.domain);
+        $('#form-category').val(event.event.extendedProps.category);
+        $('#form-startdate').val(event.event.extendedProps.startdate);
+        $('#form-starttime').val(event.event.extendedProps.starttime);
+        $('#form-enddate').val(event.event.extendedProps.enddate);
+        $('#form-endtime').val(event.event.extendedProps.endtime);
+        $('#form-location').val(event.event.extendedProps.location);
+        $('#form-subject').val(event.event.extendedProps.subject);
+        $('#form-reason_type').val(event.event.extendedProps.reason_type);
+        $('#form-reason').val(event.event.extendedProps.reason);
+        $('#form-impact').val(event.event.extendedProps.impact);
+        $('#form-remarks').val(event.event.extendedProps.remarks);
+        $('#form-vendor').val(event.event.extendedProps.vendor);
+        $('#form-vendor_phone').val(event.event.extendedProps.vendor_phone);
+        $('#form-mop').html(event.event.extendedProps.mop);
+      } else {
+        alert("Please login to edit operation")
+      }
+      },
+      dayRender: function(info) {
+        let colDate = new Date(info.date);
+
+        let frozen = specialdates.filter(item => item.specialdatename === 'Frozen').map(item => item.specialdatelist);
+        frozen = frozen[0];
+        
+        let cmhkhalfday = specialdates.filter(item => item.specialdatename === 'CMHK Half Day').map(item => item.specialdatelist);
+        cmhkhalfday = cmhkhalfday[0];
+        
+        let newyear = [
+          new Date('2019-01-01'),
+        ];
+
+        let chinesenewyear = specialdates.filter(item => item.specialdatename === 'Chinese New Year').map(item => item.specialdatelist);
+        chinesenewyear = chinesenewyear[0];
+        
+        let chingming = specialdates.filter(item => item.specialdatename === 'Ching Ming').map(item => item.specialdatelist);
+        chingming = chingming[0];
+        
+        let easter = [
+          new Date('2019-04-19'),
+          new Date('2019-04-22'),
+          new Date('2020-04-10'),
+          new Date('2020-04-13'),
+        ];
+
+        let buddha = specialdates.filter(item => item.specialdatename === 'Buddha Birthday').map(item => item.specialdatelist);
+        buddha = buddha[0];
+
+        let labor = [
+          new Date('2020-05-01'),
+        ];
+
+        let dragon = specialdates.filter(item => item.specialdatename === 'Dragon Boat').map(item => item.specialdatelist);
+        dragon = dragon[0];
+
+        let hksar = [
+          new Date('2020-07-01'),
+        ];
+        let china = [
+          new Date('2020-10-01'),
+        ];
+
+        let midautumn = specialdates.filter(item => item.specialdatename === 'Mid Autumn').map(item => item.specialdatelist);
+        midautumn = midautumn[0];
+
+        let chungyeung = specialdates.filter(item => item.specialdatename === 'Chung Yeung').map(item => item.specialdatelist);
+        chungyeung = chungyeung[0];
+        
+        let christmas = [
+          new Date('2019-12-25'),
+          new Date('2019-12-26'),
+          new Date('2020-12-25'),
+        ];
+
+        frozen.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🔒 <b>Frozen</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-frozen")
+            }
+        });
+        
+        cmhkhalfday.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '<img src="{% static 'nightwork/cmhk_small.png' %}"><b>CMHK Half Day</b>';
+            }
+        });
+        newyear.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '1️⃣ <b>New Year&#39;s Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        chinesenewyear.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🧧 <b>Chinese New Year</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        chingming.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🧹 <b>Ching Ming</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        easter.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🥚 <b>Easter</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        buddha.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🤚 <b>Buddha Birthday</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        labor.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '👷 <b>Labor Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        dragon.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🚣 <b>Dragon Boat</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        hksar.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '<img src="{% static 'nightwork/hongkong.png' %}"><b> HKSAR Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        china.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '<img src="{% static 'nightwork/china.png' %}"><b> National Day</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+        midautumn.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🌕 <b>Mid Autumn</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        chungyeung.forEach((date) => {
+        if (colDate.getYear() === date.getYear() &&
+            colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '💐 <b>Chung Yeung</b>';
+              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+          }
+        });
+        christmas.forEach((date) => {
+        if (colDate.getMonth() === date.getMonth() &&
+            colDate.getDate() === date.getDate())  {
+              info.el.innerHTML = '🎅 <b>Christmas</b>';
+              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+          }
+        });
+      },
+    });
+    calendar.render();
+
+  </script>
+
+ <div id="fullCalModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header"><meta name="c-token" content="{!! csrf_token() !!}" />
+        <h4 class="modal-title">Edit Operation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form class="form-group" method='POST' enctype='multipart/form-data'>{% csrf_token %}
+            <div class="row">
+              <div class="col-md-4 mb-4">Name</div>
+              <input type="hidden" class="col-md-5 mb-3" id="form-id" name="form-id"></input>
+              <input type="text" class="col-md-5 mb-3" id="form-name" name="form-name"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-4">Phone</div>
+              <input type="text" class="col-md-5 mb-3" id="form-phone" name="form-phone"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Domain</div>  
+              <select class="col-md-3 mb-3" id="form-domain" name="form-domain">
+                <option value="NFV">NFV</option>
+                <option value="Private Cloud">Private Cloud</option>
+                <option value="Smartcare">Smartcare</option>
+                <option value="Other">Other</option>
+              </select>
+              <div class="col-md-2 mb-4">Category</div>
+              <select class="col-md-3 mb-3" id="form-category" name="form-category">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Start Date</div>
+              <input type="date" class="col-md-3 mb-4" id="form-startdate" name="form-startdate"></input>
+              <div class="col-md-2 mb-4">End Date</div>
+              <input type="date" class="col-md-3 mb-3" id="form-enddate" name="form-enddate"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Start Time</div>
+              <input type="time" class="col-md-3 mb-3" id="form-starttime" name="form-starttime"></input>
+              <div class="col-md-2 mb-4">End Time</div>
+              <input type="time" class="col-md-3 mb-3" id="form-endtime" name="form-endtime"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Location</div>
+              <select class="col-md-3 mb-3" id="form-location" name="form-location">
+                <option value="MITA">MITA</option>
+                <option value="GNC">GNC</option>
+                <option value="KCC">KCC</option>
+                <option value="Remote">Remote</option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Subject</div>
+              <input type="text" class="col-md-9 mb-3" id="form-subject" name="form-subject"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Reason Type</div>
+              <select class="col-md-3 mb-3" id="form-reason_type" name="form-reason_type">
+                <option value="Configuration Change">Configuration Change</option>
+                <option value="Preventive Maintenance">Preventive Maintenance</option>
+                <option value="H/W upgrade">H/W upgrade</option>
+                <option value="S/W upgrade">S/W upgrade</option>
+                <option value="Expansion">Expansion</option>
+                <option value="Fault Solution">Fault Solution</option>
+                <option value="Partner Network Maintenance">Partner Network Maintenance</option>
+                <option value="Facility Maintenance">Facility Maintenance</option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Reason</div>
+              <input type="text" class="col-md-9 mb-3" id="form-reason" name="form-reason"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Impact</div>
+              <input type="text" class="col-md-9 mb-3" id="form-impact" name="form-impact"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-2 mb-4">Remarks</div>
+              <input type="text" class="col-md-5 mb-3" id="form-remarks" name="form-remarks"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-4">Vendor Staff Name (Optional)</div>
+              <input type="text" class="col-md-5 mb-3" id="form-vendor" name="form-vendor"></input>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-4">Vendor Phone (Optional)</div>
+              <input type="text" class="col-md-5 mb-3" id="form-vendor_phone" name="form-vendor_phone"></input>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <input type='submit' class="btn btn-primary" value='Save Changes'/>
+      </form>
+    </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

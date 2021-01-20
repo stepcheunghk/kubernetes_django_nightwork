@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    {{ form.name }} </br>
+    {{ form.subject }} </br>
+    {{ form.domain }} </br>
+    {{ form.startdate|date:"Y-m-d" }} ({{ form.startdate|date:"D" }}) {{ form.starttime|time:"H:i" }} - 
+    {{ form.enddate|date:"Y-m-d"}} ({{ form.enddate|date:"D" }}) {{ form.endtime|time:"H:i" }}
+</body>
+</html>
+

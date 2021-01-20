@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% load static %} {% block content%}
+<head>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'packages/core/main.css' %}"
+  />
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'packages/daygrid/main.css' %}"
+  />
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'packages/timegrid/main.css' %}"
+  />
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'packages/list/main.css' %}"
+  />
+
+  <script src="{% static 'packages/core/main.js' %}"></script>
+  <script src="{% static 'packages/interaction/main.js' %}"></script>
+  <script src="{% static 'packages/daygrid/main.js' %}"></script>
+  <script src="{% static 'packages/timegrid/main.js' %}"></script>
+  <script src="{% static 'packages/list/main.js' %}"></script>
+  <script src="{% static 'nightwork/jquery-3.4.1.min.js' %}"></script>
+</head>
+
+<legend class="border-bottom mb-8">Special Date Input</legend>
+
+<form class="form-group" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-4 mb-4">Name</div>
+    <div class="col-md-6 mb-4">{{ form.name }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-2 mb-4">Start Date</div>
+    <div class="col-md-4 mb-4">{{ form.startdate }}</div>
+    <div class="col-md-2 mb-4">End Date</div>
+    <div class="col-md-3 mb-4">{{ form.enddate }}</div>
+  </div>
+  <div class="row">
+    <div class="col text-center">
+      <input type="submit" class="btn btn-secondary" value="Create" />
+    </div>
+  </div>
+</form>
+
+{% endblock %}

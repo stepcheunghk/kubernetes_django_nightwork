@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<legend class="border-bottom mb-2">Operation Summary</legend>
+  <font size="2">
+  <p style="text-align:right; margin-bottom:5px"><a href="{% url 'export' %}">Export All</a></p>
+  <table border="1" frame="box" rules="all" style="width:100%; background-color:white;" class="table-striped">
+        <tr>
+          <th>Date</th>
+          <th style="width:40%">Service</th>
+          <th>Node</th>
+          <th>Time</th>
+          <th>Duration (min)</th>
+          <th>Outage</th>
+          <th>Impact</th>
+          <th>Reason Category</th>
+          <th style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;" >Action</th>
+        </tr>
+    <tbody>
+      {% for operation in operations %}
+        <tr>
+          <td>{{ operation.startdate|date:"Y-m-d" }}</td>
+          <td><a href="/result/{{ operation.id }}">{{ operation.subject }}</a></td>
+          <td>{{ operation.domain }}</td>
+          <td>{{ operation.starttime|time:"H:i" }} - {{operation.endtime|time:"H:i"}} </td>
+          <td>{{ operation.duration }}</td>
+          <td>None</td>
+          <td>-</td>
+          <td>{{ operation.reason_type }}</td>
+          <td><button style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  class='onDelete hidden' name={{operation.subject}} value={{operation.id}}>❌</button></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </font>
+  </br>
+
+ <div id="modal-delete" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header"><meta name="c-token" content="{!! csrf_token() !!}" />
+          <h4 class="modal-title">Are you sure you want to delete?</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+        <div class="modal-body">
+          <input type='button' class="btn btn-success" data-dismiss="modal" aria-label="Close" value='Cancel' />
+          <input type='button' class="btn btn-danger" id ='delete' value='Delete' />
+          <div id='delete-id' value='1'>
+          </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+  <script>
+  $('.onDelete').click(function(event){
+    $('#modal-delete').modal();
+    $('#delete-id').attr("value",$(this).attr("value"));
+    console.log($(this).attr("value"))
+ });
+
+   $('#delete').click(function(event){
+     id = $('#delete-id').attr("value")
+        $.ajax({
+        type: "DELETE",
+        url: '/api/operation/',
+        headers:{
+          "X-CSRFToken":  "{{ csrf_token }}"
+        },
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({id: id}),
+        dataType: 'text',
+        success: function(result){
+          if (result){
+            alert("Delete successfully")
+            location.reload();
+          }
+			  }
+    });
+   });
+  </script>
+{% endblock content %}

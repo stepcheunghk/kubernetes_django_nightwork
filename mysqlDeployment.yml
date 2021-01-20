@@ -1,16 +1,15 @@
-
-kind: PersistentVolume 
-apiVersion: v1 
-metadata:   
-  name: my-pv   
-  labels:     
-    type: local 
-spec:   
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: my-pv
+  labels:
+    type: local
+spec:
   storageClassName: manual
   capacity:
     storage: 500M
   accessModes:
-    - ReadWriteOnce   
+    - ReadWriteMany
   hostPath:
     path: "/mnt/data"
 
@@ -24,11 +23,11 @@ metadata:
 spec:
   storageClassName: manual
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 500M
----     
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,16 +49,16 @@ spec:
             - containerPort: 3306
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: root
+              value: "root"
             - name: MYSQL_DATABASE
-              value: my_db
+              value: "my_db"
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
       volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-persistent-storage-disk
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-persistent-storage-disk
 
 ---
 kind: Service
@@ -74,5 +73,3 @@ spec:
     - protocol: TCP
       port: 3306
       nodePort: 30002
-
-

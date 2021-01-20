@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrations
+spec:
+  template:
+    spec:
+      containers:
+        - name: appjarcont
+          image: kubernetes-django:1.0.2
+          command: ["python3", "manage.py", "migrate"]
+          env:
+            - name: DATABASE_HOST
+              value: "mysql"
+            - name: DATABASE_USER
+              value: "root"
+            - name: DATABASE_PASSWORD
+              value: "root"
+            - name: DATABASE_PORT
+              value: "3306"
+      restartPolicy: Never
+  backoffLimit: 5

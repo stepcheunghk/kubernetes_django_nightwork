@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <p style="font-family:arial; font-size:15px">Dear Edmond,</br></br>
+    Please kindly help approve the application for {{form.subject}} from {{ form.startdate|date:"Y-m-d" }} ({{ form.startdate|date:"D" }}) {{ form.starttime|time:"H:i" }} to
+                    {{ form.enddate|date:"Y-m-d"}} ({{ form.enddate|date:"D" }}) {{ form.endtime|time:"H:i" }}.</br>
+    The maintenance is classified as category {{form.category}}. The required application forms are filled and attached. Thank you.</br></br></p>
+
+    <table border="1" rules="all" style="font-family:arial; font-size:15px; width:70%; border-collapse:collapse">
+        <tbody>
+            <tr>
+                <th style="width:30%" scope="row" align="left">Maintenance Date/ Time</th>
+                <td style="width:60%">{{ form.startdate|date:"Y-m-d" }} ({{ form.startdate|date:"D" }}) {{ form.starttime|time:"H:i" }} -
+                    {{ form.enddate|date:"Y-m-d"}} ({{ form.enddate|date:"D" }}) {{ form.endtime|time:"H:i" }}</td>
+            </tr>
+            <tr>
+                <th scope="row" align="left">Location</th>
+                <td>{{ form.location }}</td>
+            </tr>
+            <tr>
+                <th scope="row" align="left">Node</th>
+                <td>{{ form.domain }}</td>
+            </tr>
+            <tr>
+                <th scope="row" align="left">Affected Service Impact</th>
+                <td>{{ form.impact }}</td>
+            </tr>
+            <tr>
+                <th scope="row" align="left">Reason</th>
+                <td>{{ form.reason }}</td>
+            </tr>
+            <tr>
+                <th scope="row" align="left">Responsible Staff</th>
+                <td>
+                {{ form.name}}: {{form.phone}}</br>
+                {% if form.vendor  %}
+                    {{ form.vendor|add:":"}} {{form.vendor_phone}}
+                {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row" align="left">Remarks</th>
+                <td>{{ form.remarks}}</td>
+            </tr>
+    </table>
+    </br>
+    <div style="font-family: arial; font-size:15px">Best Regards,</br></div>
+    <div class="border-bottom" style="font-family:arial; font-size:15px">{{ form.name.split | first }}</br></br></div>
+    
+</body>
+</html>
+

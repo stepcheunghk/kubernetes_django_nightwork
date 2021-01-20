@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<legend class="border-bottom mb-2">{{ domain.values.0.domain }} operations in 2020</legend>
+
+  <font size="2">
+  <table border="1" frame="box" rules="all" style="width:100%; background-color:white;" class="table-striped">
+        <tr>
+          <th>No.</th>
+          <th>Date</th>
+          <th>Staff</th>
+          <th style="width:40%">Service</th>
+          <th>Node</th>
+          <th>Location</th>
+          <th>Type  </th>
+        </tr>
+    <tbody>
+      {% for operation in domain %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ operation.startdate|date:"Y-m-d" }}</td>
+          <td>{{ operation.name }}</td>
+          <td><a href="/result/{{ operation.id }}">{{ operation.subject }}</a></td>
+          <td>{{ operation.domain }}</td>
+          <td>{{ operation.location }}</td>
+          <td>{{ operation.reason_type }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </font>
+  </br>
+{% endblock content %}

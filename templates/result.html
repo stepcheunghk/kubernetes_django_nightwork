@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content%}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    {% if message.tags %} {% endif %}
+    {% endfor %}
+</ul>
+{% endif %}
+
+<legend class="border-bottom mb-8">Template</legend>
+<input id="send-btn" type='button' class="float-right btn btn-primary" value='Application'>
+<legend class="border-bottom mb-8 col-form-label-lg">Application for {{operation.subject}} on {{operation.startdate|date:"Y-m-d"}}</legend>
+
+    Dear Edmond,</br></br>
+    Please kindly help approve the application for {{ operation.subject }} from {{ operation.startdate|date:"Y-m-d" }} ({{ operation.startdate|date:"D" }}) {{ operation.starttime|time:"H:i" }} to
+    {{ operation.enddate|date:"Y-m-d"}} ({{ operation.enddate|date:"D" }}) {{ operation.endtime|time:"H:i" }}.</br>
+    The maintenance is classified as category {{ operation.category }}. The required application forms are filled and attached. Thank you.</br></br>
+
+    <table border="1" frame="box" rules="all" style="width:55%; background-color:white;" class="table-striped">
+        <tbody>
+            <tr>
+                <th style="width:30%" scope="row">Maintenance Date/ Time</th>
+                <td style="width:60%">{{ operation.startdate|date:"Y-m-d" }} ({{ operation.startdate|date:"D" }}) {{ operation.starttime|time:"H:i" }} -
+                    {{ operation.enddate|date:"Y-m-d"}} ({{ operation.enddate|date:"D" }}) {{ operation.endtime|time:"H:i" }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Location</th>
+                <td>{{ operation.location}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Node</th>
+                <td>{{ operation.domain}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Affected Service Impact</th>
+                <td>{{ operation.impact}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Reason</th>
+                <td>{{ operation.reason}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Responsible Staff</th>
+                <td>
+                CMHK: {{ operation.name}} ({{operation.phone}})</br>
+                {% if operation.vendor  %}
+                    Huawei: {{ operation.vendor|add:""}} ({{operation.vendor_phone}})
+                {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Remarks</th>
+                <td>{{ operation.remarks}}</td>
+            </tr>
+    </table>
+    </br>
+    Best Regards,</br>
+    <div class="border-bottom"> {{ operation.name.split | first }}</br></br></div>
+
+<legend class="mb-8"></legend>
+<input id="send-btn2" type='button' class="float-right btn btn-primary" value='Planned Maintenance' >
+<legend class="border-bottom mb-8 col-form-label-lg">[Planned Maintenance] {{operation.subject}} on {{operation.startdate|date:"Y-m-d"}}</legend>
+    Dear all,</br></br>
+    Please kindly note the maintenance below. Thanks. </br></br>
+    <table border="1" frame="box" rules="all" style="width:55%; background-color:white;" class="table-striped">
+        <tbody>
+            <tr>
+                <th style="width:30%" scope="row">Maintenance Date/ Time</th>
+                <td style="width:60%">{{ operation.startdate|date:"Y-m-d" }} ({{ operation.startdate|date:"D" }}) {{ operation.starttime|time:"H:i" }} -
+                    {{ operation.enddate|date:"Y-m-d"}} ({{ operation.enddate|date:"D" }}) {{ operation.endtime|time:"H:i" }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Location</th>
+                <td>{{ operation.location}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Node</th>
+                <td>{{ operation.domain}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Affected Service Impact</th>
+                <td>{{ operation.impact}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Reason</th>
+                <td>{{ operation.reason}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Responsible Staff</th>
+                <td>
+                CMHK: {{ operation.name}} ({{operation.phone}})</br>
+                {% if operation.vendor  %}
+                    Huawei: {{ operation.vendor|add:""}} ({{operation.vendor_phone}})
+                {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Remarks</th>
+                <td>{{ operation.remarks}} </td>
+            </tr>
+    </table></br>
+    Best Regards,</br>
+    {{ operation.name.split | first }}</br></br>
+
+    <script type="text/javascript">
+    document.getElementById("send-btn").onclick = function () {
+        location.href = "/application/" + "{{ operation.id }}";
+        $(this).val('Sent');
+        $("#send-btn").addClass('btn-success');
+        $(this).attr("disabled", true);
+        setTimeout(function() {
+            $('#btnTest').removeAttr("disabled");      
+        }, 30000);
+    };
+
+    document.getElementById("send-btn2").onclick = function () {
+        location.href = "/plannedmain/" + "{{ operation.id }}";
+        $(this).val('Sent');
+        $("#send-btn2").addClass('btn-success');
+        $(this).attr("disabled", true);
+        setTimeout(function() {
+            $('#btnTest').removeAttr("disabled");      
+        }, 30000);
+    };
+</script>
+{% endblock %}

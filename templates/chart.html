@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<legend class="border-bottom mb-8">Summary</legend>
+    <div id="container">
+      <canvas id="bar-chart" class="col-md-8" style="float:left"></canvas>
+      <canvas id="pie-chart" class="col-md-4" style="height:36vh; width:35vw; float:right"></canvas>
+    </div>
+  
+  <script src="{% static 'nightwork/chart.min.js' %}"></script>
+  <script src="{% static 'nightwork/chartjs-plugin-labels.js' %}"></script>
+    <script src="{% static 'nightwork/chartjs-plugin-datalabels.min.js' %}"></script>
+  <script>
+    var op = "{{ count }}"
+    Chart.pluginService.register({
+      beforeDraw: function (chart) {
+      if (chart.config.options.elements.center) {
+        let ctx = chart.chart.ctx;
+
+        let centerConfig = chart.config.options.elements.center;
+        let txt = centerConfig.text;
+        let txt2 = centerConfig.text2;
+        let color = centerConfig.color || '#000';
+        let centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+        let centerY = ((chart.chartArea.top + chart.chartArea.bottom + 10) / 2);
+        let centerY2 = ((chart.chartArea.top + chart.chartArea.bottom + 70)/ 2);
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '3em sans-serif';
+
+        ctx.fontStyle = 'bold';
+        ctx.fontWeight = '900';
+        ctx.fillStyle = color;
+
+        ctx.fillText(txt, centerX, centerY);
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '2em sans-serif';
+
+        ctx.fontStyle = 'bold';
+        ctx.fontWeight = '900';
+        ctx.fillStyle = color;
+        ctx.fillText(txt2, centerX, centerY2);
+        }
+      }
+    });
+
+    
+    var newLegendClickHandler = function (e, legendItem) {
+    var index = legendItem.datasetIndex;
+
+    if (index > 1) {
+        // Do the original logic
+        defaultLegendClickHandler(e, legendItem);
+    } else {
+        let ci = this.chart;
+        [
+            ci.getDatasetMeta(0),
+            ci.getDatasetMeta(1)
+        ].forEach(function(meta) {
+            meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+        });
+        ci.update();
+    }
+    };
+
+    var date = new Date();
+    var year = date.getFullYear();
+
+    var config = {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: {{ data|safe }},
+          backgroundColor: [
+            '#ffaf8c', '#ebe47a', '#a2d9e0', '#a4e6a1'
+          ],
+          label: 'domain'
+        }],
+        labels:
+          {{ domain|safe }}
+      },
+      options: {
+        legend: {
+          display: true,
+          onClick: newLegendClickHandler,
+        },
+        maintainAspectRatio: true,
+        cutoutPercentage: 40,
+        animation: {
+          duration: 2000,
+        },
+        responsive: true,
+          title: {
+            display: true,
+            fontSize: 20,
+            text: 'Operations sorted by Domain in ' + year
+          },
+        elements:{
+          center: {
+            text: op,
+            text2: "",
+          }
+        },
+        plugins: {
+          datalabels:{
+            display: false,
+            color: '#36A2EB'
+          },
+          labels: {
+            render: 'percentage',
+            fontSize: 20,
+          }
+        },
+      },
+    };
+
+    var config2 = {
+      type: 'line',
+      data: {
+        datasets: [{
+          data: {{ ym_count|safe }},
+          label: 'Operations',
+          borderColor: '#3e95cd',
+          pointRadius: 5,
+          pointHoverRadius: 6,
+        }],
+        labels:
+          {{ period|safe }}
+      },
+      options: {
+        legend: {
+          display: true,
+          onClick: newLegendClickHandler,
+        },
+        title: {
+          display: true,
+          fontSize: 20,
+          text: 'Operation Summary last 12 months'
+        },
+        plugins:{
+          datalabels:{
+            display:true,
+            backgroundColor: "#3e95cd",
+						borderRadius: 3,
+						color: 'white',
+						font: {
+							weight: 'bold'
+						},
+          },
+        },
+        scales: {
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Month'
+            }
+          }],
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 'no. of operations'
+            },
+          }],
+        }, 
+      },
+    };
+
+    window.onload = function() {
+      var ctx = document.getElementById('pie-chart').getContext('2d');
+      var ctx2 = document.getElementById('bar-chart').getContext('2d');
+      window.myPie = new Chart(ctx, config);
+      window.myBar = new Chart(ctx2, config2);
+    };
+
+    document.getElementById("pie-chart").onclick = function(evt){
+      var activePoints = myPie.getElementsAtEvent(evt);
+      var firstPoint = activePoints[0];
+      var label = myPie.data.labels[firstPoint._index];
+      var value = myPie.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+      window.location='/domain/' + label;
+    };
+  </script>
+{% endblock content %}

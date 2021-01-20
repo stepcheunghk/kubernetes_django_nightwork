@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content%}
+<legend class="border-bottom mb-8">Operation Details (EDIT)</legend>
+    <form class="form-group" method='POST' enctype='multipart/form-data'>{% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 mb-4">Name</div>
+        <div class="col-md-6 mb-4">{{ form.name }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Phone</div>
+        <div class="col-md-6 mb-4">{{ form.phone }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 mb-4">Domain</div>       
+        <div class="col-md-4 mb-4">{{ form.domain }}</div>
+        <div class="col-md-2 mb-4">Category</div>
+        <div class="col-md-3 mb-4">{{ form.category }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 mb-4">Start Date</div>
+        <div class="col-md-4 mb-4">{{ form.startdate }}</div>
+        <div class="col-md-2 mb-4">End Date</div>
+        <div class="col-md-3 mb-4">{{ form.enddate }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 mb-4">Start Time</div>
+        <div class="col-md-4 mb-4">{{ form.starttime }}</div>
+        <div class="col-md-2 mb-4">End Time</div>
+        <div class="col-md-3 mb-4">{{ form.endtime }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Location</div>
+        <div class="col-md-6 mb-4">{{ form.location }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Subject</div>
+        <div class="col-md-6 mb-4">{{ form.subject }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Reason Type</div>
+        <div class="col-md-6 mb-4">{{ form.reason_type }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Reason</div>
+        <div class="col-md-6 mb-4">{{ form.reason }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Impact</div>
+        <div class="col-md-6 mb-4">{{ form.impact }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Remarks</div>
+        <div class="col-md-6 mb-4">{{ form.remarks }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Vendor Staff Name (Optional)</div>
+        <div class="col-md-6 mb-4">{{ form.vendor }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">Vendor Phone (Optional)</div>
+        <div class="col-md-6 mb-4">{{ form.vendor_phone }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">MOP Upload</div>
+        <div class="col-md-6 mb-4">{{ form.mop }}</div>
+    </div>
+    <div class="row">
+    <div class="col text-center"> 
+        <input type='submit' class="btn btn-secondary" value='Save' />
+    </div>
+    </div>
+    </form>
+{% endblock %}
