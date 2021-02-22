@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<legend class="border-bottom mb-2">{{ domain.values.0.domain }} operations in 2020</legend>
+<legend class="border-bottom mb-2">{{ domain.values.0.domain }} operations in {{ domain.values.0.startdate|date:"Y" }}</legend>
 
   <font size="2">
   <table border="1" frame="box" rules="all" style="width:100%; background-color:white;" class="table-striped">

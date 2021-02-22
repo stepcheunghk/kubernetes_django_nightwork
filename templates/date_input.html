@@ -30,18 +30,21 @@
 </head>
 
 <legend class="border-bottom mb-8">Special Date Input</legend>
+<p style="text-align: right; margin-bottom: 5px">
+  <a href="{% url 'dateInputSuccess' %}">Special Date List</a>
+</p>
 
 <form class="form-group" method="POST" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="row">
     <div class="col-md-4 mb-4">Name</div>
-    <div class="col-md-6 mb-4">{{ form.name }}</div>
+    <div class="col-md-6 mb-4">{{ formDate.name }}</div>
   </div>
   <div class="row">
     <div class="col-md-2 mb-4">Start Date</div>
-    <div class="col-md-4 mb-4">{{ form.startdate }}</div>
+    <div class="col-md-4 mb-4">{{ formDate.startdate }}</div>
     <div class="col-md-2 mb-4">End Date</div>
-    <div class="col-md-3 mb-4">{{ form.enddate }}</div>
+    <div class="col-md-3 mb-4">{{ formDate.enddate }}</div>
   </div>
   <div class="row">
     <div class="col text-center">

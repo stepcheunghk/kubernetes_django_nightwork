@@ -5,6 +5,8 @@ import datetime
 STAFF=[
     ('Roger Liu', 'Roger Liu'),
     ('Teddy Kwong', 'Teddy Kwong'),
+    ('Rick Ching', 'Rick Ching'),
+    ('David Lun', 'David Lun'),
     ('Matt So', 'Matt So'),
     ('Nancy Nie', 'Nancy Nie'),
     ('Leo Liu', 'Leo Liu'),

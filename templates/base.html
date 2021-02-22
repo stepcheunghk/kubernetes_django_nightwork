@@ -45,6 +45,7 @@
               {% if user.is_authenticated %}
                 <a class="nav-item nav-link"><img src="{% static 'nightwork/user.png' %}"/> {{ user.username }}</a>
                 <a class="nav-item nav-link" "href=javascript:;" id="operation"><img src="{% static 'nightwork/create.png' %}"/> New Operation</a>
+                <a class="nav-item nav-link" href="{% url 'dateInput' %}"><img src="{% static 'nightwork/calendar.png' %}"/> Date Input</a>
                 <a class="nav-item nav-link" href="{% url 'history' %}"><img src="{% static 'nightwork/history.png' %}"/> History</a>
                 <a class="nav-item nav-link" href="{% url 'logout' %}"><img src="{% static 'nightwork/logout.png' %}"/> Logout</a>
               {% else %}
@@ -160,6 +161,10 @@ $('#operation').click(function(event){
     $("#id_name").change(function(){
         if ($('#id_name option:selected').text() == "Teddy Kwong"){
             $("#id_phone").val("92044001");
+        } else if ($('#id_name option:selected').text() == "Rick Ching"){
+            $("#id_phone").val("92047128");
+        } else if ($('#id_name option:selected').text() == "David Lun"){
+            $("#id_phone").val("92049174");
         } else if ($('#id_name option:selected').text() == "Matt So"){
             $("#id_phone").val("92047569");
         } else if ($('#id_name option:selected').text() == "Nancy Nie"){

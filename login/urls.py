@@ -18,5 +18,7 @@ urlpatterns = [
     path('export/', op_views.export, name='export'),
     path('summary/', op_views.chart, name='summary'),
     path('dateInput/', op_views.dateInput, name='dateInput'),
-    path('api/operation/', op_views.api, name='api'),
+    path('dateInput/success/', op_views.DateInputSuccessListView.as_view(), name='dateInputSuccess'),
+    path('api/operation/', op_views.apiOps, name='apiOps'),
+    path('api/dateinput/', op_views.apiDate, name='apiDate'),
 ]

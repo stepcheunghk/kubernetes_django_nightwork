@@ -93,7 +93,7 @@ def update(request, id=None):
     } 
     return render(request, "update.html", context)
 
-def api(request):
+def apiOps(request):
     if  request.method == 'DELETE':
         data = json.loads(request.body.decode('utf-8'))
         id = data['id']
@@ -102,19 +102,42 @@ def api(request):
     else:
         return JsonResponse({'msg':'fail'})        
 
+def apiDate(request):
+    if  request.method == 'DELETE':
+        data = json.loads(request.body.decode('utf-8'))
+        id = data['id']
+        SpecialDate.objects.filter(id=id).delete()
+        return JsonResponse({'msg':'true'})
+    else:
+        return JsonResponse({'msg':'fail'})        
+
 @login_required(login_url="/login/")
 def dateInput(request):
     if  request.method == 'POST':
-        form = SpecialDateForm(request.POST or None, request.FILES or None)
+        formDate = SpecialDateForm(request.POST or None, request.FILES or None)
+        form = RawOperationForm(request.POST or None, request.FILES or None)
+        if formDate.is_valid():
+            newDate = SpecialDate.objects.create(**formDate.cleaned_data)
+            dateId = newDate.id
+            formDate = SpecialDate.objects.get(id=dateId)
+            return redirect('/dateInput/success/')
+        else:
+            print(formDate.errors)
+            
         if form.is_valid():
-            new = SpecialDate.objects.create(**form.cleaned_data)
-            id = new.id
-            form = SpecialDate.objects.get(id=id)
-            return redirect('result', pk=id)
+            newOp = Operation.objects.create(**form.cleaned_data)
+            opId = newOp.id
+            form = Operation.objects.get(id=opId)
+            context = {
+                'form': form
+            }
+            return redirect('result', pk=opId)
         else:
             print(form.errors)
+        
     return render(request, "date_input.html",{
-        'form'       : SpecialDateForm(request.POST or None)
+        'formDate': SpecialDateForm(request.POST or None),
+        'form': RawOperationForm(request.POST or None)
     })
 
 
@@ -278,7 +301,50 @@ class HistoryListView(AdminStaffRequiredMixin, ListView):
         }
         return context
 
-class HomeTestListView(ListView):
+class DateInputSuccessListView(AdminStaffRequiredMixin, ListView):
+    login_url = '/login/'
+    model = SpecialDate
+    template_name = 'date_input_success.html'
+    context_object_name = 'dates'
+    ordering = ['-startdate']
+
+    def get_context_data(self, **kwargs):
+        initial_data = {
+            'remarks' : "N/A",
+            'impact': "No Service Impact"
+        }
+        if self.request.method == 'GET':
+            context = super(DateInputSuccessListView, self).get_context_data(**kwargs)
+            context['form'] = RawOperationForm(initial=initial_data)
+            return context
+    
+    def post(self, request):
+        form = RawOperationForm(self.request.POST or None, self.request.FILES or None)
+        if form.is_valid():
+            new = Operation.objects.create(**form.cleaned_data)
+            id = new.id
+            form = Operation.objects.get(id=id)
+            subject = "A new operation has just been created by " + form.name
+            context = {
+                'form': form
+            }
+            msg_html = render_to_string('notice.html', context)
+            subject, from_email, to = subject, 'stephencheung@hk.chinamobile.com', 'stephencheung@hk.chinamobile.com'
+            html_content = msg_html
+            msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            messages.success(self.request, "Operation Created")
+            return redirect('result', pk=id)
+        else:
+            print(form.errors)
+        context = {
+            "form": form
+        }
+        return context
+
+# New Version
+class HomeListView(ListView):
     template_name = 'homeTest.html'
     context_object_name = 'operations'
     queryset = Operation.objects.all()
@@ -288,12 +354,74 @@ class HomeTestListView(ListView):
             'remarks' : "N/A",
             'impact': "No Service Impact"
         }
-        context = super(HomeTestListView, self).get_context_data(**kwargs)
+        context = super(HomeListView, self).get_context_data(**kwargs)
         context['ops'] = Operation.objects.all()
         context['dates'] = SpecialDate.objects.all()
+        context['form'] = RawOperationForm(self.request.POST or None, initial=initial_data)
         return context  
 
-class HomeListView(ListView):
+    def post(self, request):
+        if request.method == 'POST':
+            print(request.POST)
+            if request.POST.get('form-id'):
+                op = Operation.objects.get(id=request.POST.get('form-id'))
+                op.name= request.POST.get('form-name')
+                op.phone= request.POST.get('form-phone')
+                op.domain= request.POST.get('form-domain')
+                op.category= request.POST.get('form-category')
+                startdatetime = str(request.POST.get('form-startdate')) +  ' ' + str(request.POST.get('form-starttime'))
+                if len(str(request.POST.get('form-starttime')).split(":")) == 2:
+                    startdatetime = datetime.datetime.strptime(startdatetime, '%Y-%m-%d %H:%M')
+                else:
+                    startdatetime = datetime.datetime.strptime(startdatetime, '%Y-%m-%d %H:%M:%S')
+                op.startdate= startdatetime
+                op.starttime= startdatetime
+                enddatetime = str(request.POST.get('form-enddate')) +  ' ' + str(request.POST.get('form-endtime'))
+                if len(str(request.POST.get('form-endtime')).split(":")) == 2:
+                    enddatetime = datetime.datetime.strptime(enddatetime, '%Y-%m-%d %H:%M')
+                else:
+                    enddatetime = datetime.datetime.strptime(enddatetime, '%Y-%m-%d %H:%M:%S')
+                op.enddate= enddatetime
+                op.endtime= enddatetime
+                op.location= request.POST.get('form-location')
+                op.subject= request.POST.get('form-subject')
+                op.reason_type= request.POST.get('form-reason_type')
+                op.reason= request.POST.get('form-reason')
+                op.impact= request.POST.get('form-impact')
+                op.remarks= request.POST.get('form-remarks')
+                op.vendor= request.POST.get('form-vendor')
+                op.vendor_phone= request.POST.get('form-vendor_phone')
+                op.save()
+                messages.success(self.request, "Operation Updated")
+                return redirect('result', pk=request.POST.get('form-id'))
+            else:
+                form = RawOperationForm(self.request.POST or None, self.request.FILES or None)
+                if form.is_valid():
+                    new = Operation.objects.create(**form.cleaned_data)
+                    id = new.id
+                    form = Operation.objects.get(id=id)
+                    subject = "A new operation has just been created by " + form.name
+                    context = {
+                        'form': form
+                    }
+                    msg_html = render_to_string('notice.html', context)
+                    subject, from_email, to = subject, 'stephencheung@hk.chinamobile.com', 'stephencheung@hk.chinamobile.com'
+                    html_content = msg_html
+                    msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
+                    msg.attach_alternative(html_content, "text/html")
+                    # msg.send()
+                    messages.success(self.request, "Operation Created")
+                    return redirect('result', pk=id)
+                else:
+                    print(form.errors)
+                context = {
+                    "form": form
+                }
+                return context
+
+
+# Old Version
+class HomeTestListView(ListView):
     model = Operation
     template_name = 'home.html'
     context_object_name = 'operations'
@@ -304,7 +432,7 @@ class HomeListView(ListView):
             'remarks' : "N/A",
             'impact': "No Service Impact"
         }
-        context = super(HomeListView, self).get_context_data(**kwargs)
+        context = super(HomeTestListView, self).get_context_data(**kwargs)
         context['form'] = RawOperationForm(self.request.POST or None, initial=initial_data)
         return context
     
@@ -373,6 +501,7 @@ class DomainListView(ListView):
     template_name = 'info.html'
 
     def get_context_data(self, *args, **kwargs):
+        today = date.today()
         initial_data = {
             'remarks' : "N/A",
             'impact': "No Service Impact"
@@ -380,7 +509,7 @@ class DomainListView(ListView):
         if self.request.method == "GET":
             context = super(DomainListView, self).get_context_data(*args, **kwargs)
             context['domain'] = Operation.objects.filter(domain__icontains=self.kwargs['domain'])
-            context['domain'] = context['domain'].filter(startdate__year='2020').order_by('startdate').reverse()
+            context['domain'] = context['domain'].filter(startdate__year=today.year).order_by('startdate').reverse()
             context['form'] = RawOperationForm(self.request.POST or None, initial=initial_data)
             return context
 
