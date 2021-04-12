@@ -13,7 +13,6 @@
 <script src="{% static 'packages/daygrid/main.js' %}"></script>
 <script src="{% static 'packages/timegrid/main.js' %}"></script>
 <script src="{% static 'packages/list/main.js' %}"></script>
-<script src="{% static 'nightwork/jquery-3.4.1.min.js' %}"></script>
 
 </head>
 <style>
@@ -81,68 +80,68 @@
   </div>
 
   <script>
-        var events = []
-        var specialdates = []
-        var domain2color = {
-        "NFV": "#ffaf8c",
-        "Private Cloud": "#a2d9e0",
-        "Smartcare": "#a4e6a1",
-        "Other": "#ebe47a" 
-        }
-      var user = $('.user')[0].innerHTML
-      var element_date = $(".sd").each(function(i, obj) {
-          var specialdatename = obj.getElementsByClassName("specialdatename")[0].innerHTML
-          var specialdatestart = obj.getElementsByClassName("specialdatestart")[0].innerHTML
-          var specialdateend = obj.getElementsByClassName("specialdateend")[0].innerHTML
-          specialdates.push({
-            "specialdatename": specialdatename,
-            "specialdatestart": specialdatestart,
-            "specialdateend": specialdateend})
-          });
+    var events = []
+    var specialdates = []
+    var domain2color = {
+    "NFV": "#ffaf8c",
+    "Private Cloud": "#a2d9e0",
+    "Smartcare": "#a4e6a1",
+    "Other": "#ebe47a" 
+    }
+    var user = $('.user')[0].innerHTML
+    var element_date = $(".sd").each(function(i, obj) {
+        var specialdatename = obj.getElementsByClassName("specialdatename")[0].innerHTML
+        var specialdatestart = obj.getElementsByClassName("specialdatestart")[0].innerHTML
+        var specialdateend = obj.getElementsByClassName("specialdateend")[0].innerHTML
+        specialdates.push({
+          "specialdatename": specialdatename,
+          "specialdatestart": specialdatestart,
+          "specialdateend": specialdateend})
+        });
 
-      var element_op = $(".op").each(function(i, obj) {
-          var id      = obj.getElementsByClassName("id")[0].innerHTML
-          var name      = obj.getElementsByClassName("name")[0].innerHTML
-          var phone     = obj.getElementsByClassName("phone")[0].innerHTML
-          var domain    = obj.getElementsByClassName("domain")[0].innerHTML
-          var category  = obj.getElementsByClassName("category")[0].innerHTML
-          var subject   = obj.getElementsByClassName("subject")[0].innerHTML
-          var location  = obj.getElementsByClassName("location")[0].innerHTML
-          var reason_type   = obj.getElementsByClassName("reason_type")[0].innerHTML
-          var reason    = obj.getElementsByClassName("reason")[0].innerHTML
-          var impact    = obj.getElementsByClassName("impact")[0].innerHTML
-          var remarks   = obj.getElementsByClassName("remarks")[0].innerHTML
-          var vendor    = obj.getElementsByClassName("vendor")[0].innerHTML
-          var vendor_phone   = obj.getElementsByClassName("vendor_phone")[0].innerHTML
-          var mop       = obj.getElementsByClassName("mop")[0].innerHTML
-          var startdate = obj.getElementsByClassName("startdate")[0].innerHTML
-          var starttime = obj.getElementsByClassName("starttime")[0].innerHTML
-          var enddate   = obj.getElementsByClassName("enddate")[0].innerHTML
-          var endtime   = obj.getElementsByClassName("endtime")[0].innerHTML
-          events.push({
-            "title": name + " - " + subject,
-            "id"   : id,
-            "name" : name,
-            "phone": phone,
-            "domain" : domain,
-            "category": category,
-            "startdate": startdate,
-            "starttime": starttime,
-            "enddate": enddate,
-            "endtime": endtime,
-            "location": location,
-            "subject" : subject,
-            "reason_type": reason_type,
-            "reason": reason,
-            "impact": impact,
-            "remarks": remarks,
-            "vendor": vendor,
-            "vendor_phone": vendor_phone,
-            "mop": mop,
-            "start": startdate, 
-            "end": enddate,
-            "color": domain2color[domain]})
-          });
+    var element_op = $(".op").each(function(i, obj) {
+        var id      = obj.getElementsByClassName("id")[0].innerHTML
+        var name      = obj.getElementsByClassName("name")[0].innerHTML
+        var phone     = obj.getElementsByClassName("phone")[0].innerHTML
+        var domain    = obj.getElementsByClassName("domain")[0].innerHTML
+        var category  = obj.getElementsByClassName("category")[0].innerHTML
+        var subject   = obj.getElementsByClassName("subject")[0].innerHTML
+        var location  = obj.getElementsByClassName("location")[0].innerHTML
+        var reason_type   = obj.getElementsByClassName("reason_type")[0].innerHTML
+        var reason    = obj.getElementsByClassName("reason")[0].innerHTML
+        var impact    = obj.getElementsByClassName("impact")[0].innerHTML
+        var remarks   = obj.getElementsByClassName("remarks")[0].innerHTML
+        var vendor    = obj.getElementsByClassName("vendor")[0].innerHTML
+        var vendor_phone   = obj.getElementsByClassName("vendor_phone")[0].innerHTML
+        var mop       = obj.getElementsByClassName("mop")[0].innerHTML
+        var startdate = obj.getElementsByClassName("startdate")[0].innerHTML
+        var starttime = obj.getElementsByClassName("starttime")[0].innerHTML
+        var enddate   = obj.getElementsByClassName("enddate")[0].innerHTML
+        var endtime   = obj.getElementsByClassName("endtime")[0].innerHTML
+        events.push({
+          "title": name + " - " + subject,
+          "id"   : id,
+          "name" : name,
+          "phone": phone,
+          "domain" : domain,
+          "category": category,
+          "startdate": startdate,
+          "starttime": starttime,
+          "enddate": enddate,
+          "endtime": endtime,
+          "location": location,
+          "subject" : subject,
+          "reason_type": reason_type,
+          "reason": reason,
+          "impact": impact,
+          "remarks": remarks,
+          "vendor": vendor,
+          "vendor_phone": vendor_phone,
+          "mop": mop,
+          "start": startdate, 
+          "end": enddate,
+          "color": domain2color[domain]})
+        });
 
     var specialdates = specialdates;
     for (date in specialdates){
@@ -167,13 +166,18 @@
         } else {
           var obj = {
             specialdatename: cur.specialdatename,
-            specialdatelist: [cur.specialdatelist].flat(Infinity)
+            specialdatelist: [cur.specialdatelist].reduce(function (acc, val) {
+              return acc.concat(val);
+            }, [])
           };
           o = o.concat([obj]);
         }
         return o;
     }, []);
 
+    document.addEventListener('DOMContentloaded', function(){
+      
+    })
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
       plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list'],
@@ -192,65 +196,91 @@
       eventLimit: true, 
       events: events,
       specialdates: specialdates,
-      eventClick:  function(event) {
-      if (user) {
-        $('#fullCalModal').modal();
-        $('#form-id').val(event.event.id);
-        $('#form-name').val(event.event.extendedProps.name);
-        $('#form-phone').val(event.event.extendedProps.phone);
-        $('#form-domain').val(event.event.extendedProps.domain);
-        $('#form-category').val(event.event.extendedProps.category);
-        $('#form-startdate').val(event.event.extendedProps.startdate);
-        $('#form-starttime').val(event.event.extendedProps.starttime);
-        $('#form-enddate').val(event.event.extendedProps.enddate);
-        $('#form-endtime').val(event.event.extendedProps.endtime);
-        $('#form-location').val(event.event.extendedProps.location);
-        $('#form-subject').val(event.event.extendedProps.subject);
-        $('#form-reason_type').val(event.event.extendedProps.reason_type);
-        $('#form-reason').val(event.event.extendedProps.reason);
-        $('#form-impact').val(event.event.extendedProps.impact);
-        $('#form-remarks').val(event.event.extendedProps.remarks);
-        $('#form-vendor').val(event.event.extendedProps.vendor);
-        $('#form-vendor_phone').val(event.event.extendedProps.vendor_phone);
-        $('#form-mop').html(event.event.extendedProps.mop);
-      } else {
-        alert("Please login to edit operation")
-      }
+      eventClick: function(event, jsEvent, view){   
+        if (user) {
+          $('#fullCalModal').modal();
+          $('#form-id').val(event.event.id);
+          $('#form-name').val(event.event.extendedProps.name);
+          $('#form-phone').val(event.event.extendedProps.phone);
+          $('#form-domain').val(event.event.extendedProps.domain);
+          $('#form-category').val(event.event.extendedProps.category);
+          $('#form-startdate').val(event.event.extendedProps.startdate);
+          $('#form-starttime').val(event.event.extendedProps.starttime);
+          $('#form-enddate').val(event.event.extendedProps.enddate);
+          $('#form-endtime').val(event.event.extendedProps.endtime);
+          $('#form-location').val(event.event.extendedProps.location);
+          $('#form-subject').val(event.event.extendedProps.subject);
+          $('#form-reason_type').val(event.event.extendedProps.reason_type);
+          $('#form-reason').val(event.event.extendedProps.reason);
+          $('#form-impact').val(event.event.extendedProps.impact);
+          $('#form-remarks').val(event.event.extendedProps.remarks);
+          $('#form-vendor').val(event.event.extendedProps.vendor);
+          $('#form-vendor_phone').val(event.event.extendedProps.vendor_phone);
+          $('#form-mop').html(event.event.extendedProps.mop);
+        } else {
+          alert("Please login to edit operation");
+        }
       },
       dayRender: function(info) {
         let colDate = new Date(info.date);
 
-        let frozen = specialdates.filter(item => item.specialdatename === 'Frozen').map(item => item.specialdatelist);
+        var frozen = specialdates.filter(function (item) {
+          return item.specialdatename === 'Frozen';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         frozen = frozen[0];
-        
-        let cmhkhalfday = specialdates.filter(item => item.specialdatename === 'CMHK Half Day').map(item => item.specialdatelist);
+
+        var cmhkhalfday = specialdates.filter(function (item) {
+          return item.specialdatename === 'CMHK Half Day';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         cmhkhalfday = cmhkhalfday[0];
+
+
         
         let newyear = [
           new Date('2019-01-01'),
         ];
 
-        let chinesenewyear = specialdates.filter(item => item.specialdatename === 'Chinese New Year').map(item => item.specialdatelist);
+        var chinesenewyear = specialdates.filter(function (item) {
+          return item.specialdatename === 'Chinese New Year';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         chinesenewyear = chinesenewyear[0];
         
-        let chingming = specialdates.filter(item => item.specialdatename === 'Ching Ming').map(item => item.specialdatelist);
+        var chingming = specialdates.filter(function (item) {
+          return item.specialdatename === 'Ching Ming';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         chingming = chingming[0];
         
-        let easter = [
-          new Date('2019-04-19'),
-          new Date('2019-04-22'),
-          new Date('2020-04-10'),
-          new Date('2020-04-13'),
-        ];
+        var easter = specialdates.filter(function (item) {
+          return item.specialdatename === 'Easter';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
+        easter = easter[0];
 
-        let buddha = specialdates.filter(item => item.specialdatename === 'Buddha Birthday').map(item => item.specialdatelist);
+        var buddha = specialdates.filter(function (item) {
+          return item.specialdatename === 'Buddha Birthday';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         buddha = buddha[0];
 
         let labor = [
           new Date('2020-05-01'),
         ];
 
-        let dragon = specialdates.filter(item => item.specialdatename === 'Dragon Boat').map(item => item.specialdatelist);
+        var dragon = specialdates.filter(function (item) {
+          return item.specialdatename === 'Dragon Boat';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         dragon = dragon[0];
 
         let hksar = [
@@ -260,10 +290,18 @@
           new Date('2020-10-01'),
         ];
 
-        let midautumn = specialdates.filter(item => item.specialdatename === 'Mid Autumn').map(item => item.specialdatelist);
+        var midautumn = specialdates.filter(function (item) {
+          return item.specialdatename === 'Mid Autumn';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         midautumn = midautumn[0];
 
-        let chungyeung = specialdates.filter(item => item.specialdatename === 'Chung Yeung').map(item => item.specialdatelist);
+        var chungyeung = specialdates.filter(function (item) {
+          return item.specialdatename === 'Chung Yeung';
+        }).map(function (item) {
+          return item.specialdatelist;
+        });
         chungyeung = chungyeung[0];
         
         let christmas = [
@@ -272,117 +310,106 @@
           new Date('2020-12-25'),
         ];
 
-        frozen.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🔒 <b>Frozen</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-frozen")
-            }
+        frozen.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🔒 <b>Frozen</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-frozen");
+            console.log(("0"+(date.getDate()).toString()).slice(-2))
+          }
         });
         
-        cmhkhalfday.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '<img src="{% static 'nightwork/cmhk_small.png' %}"><b>CMHK Half Day</b>';
-            }
-        });
-        newyear.forEach((date) => {
-        if (colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '1️⃣ <b>New Year&#39;s Day</b>';
-              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+        cmhkhalfday.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '<img src="{% static 'nightwork/cmhk_small.png' %}"><b>CMHK Half Day</b>';
           }
         });
-        chinesenewyear.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🧧 <b>Chinese New Year</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+
+        newyear.forEach(function (date) {
+          if (colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '1️⃣ <b>New Year&#39;s Day</b>';
+            $("[data-date='" + colDate.getFullYear() + "-" + ("0"+(colDate.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(colDate.getDate()).toString()).slice(-2) + "']").removeClass("fc-frozen").addClass("fc-holiday");
           }
         });
-        chingming.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🧹 <b>Ching Ming</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+
+        chinesenewyear.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🧧 <b>Chinese New Year</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-holiday");
           }
         });
-        easter.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🥚 <b>Easter</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+
+        chingming.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🧹 <b>Ching Ming</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-holiday");
           }
         });
-        buddha.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🤚 <b>Buddha Birthday</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+
+        easter.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🥚 <b>Easter</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-holiday");
           }
         });
-        labor.forEach((date) => {
-        if (colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '👷 <b>Labor Day</b>';
-              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+
+        buddha.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🤚 <b>Buddha Birthday</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-holiday");
           }
         });
-        dragon.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🚣 <b>Dragon Boat</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+
+        labor.forEach(function (date) {
+          if (colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '👷 <b>Labor Day</b>';
+            $("[data-date='" + colDate.getFullYear() + "-" + ("0"+(colDate.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(colDate.getDate()).toString()).slice(-2) + "']").removeClass("fc-frozen").addClass("fc-holiday");
           }
         });
-        hksar.forEach((date) => {
-        if (colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '<img src="{% static 'nightwork/hongkong.png' %}"><b> HKSAR Day</b>';
-              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+
+        dragon.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🚣 <b>Dragon Boat</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-holiday");
           }
         });
-        china.forEach((date) => {
-        if (colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '<img src="{% static 'nightwork/china.png' %}"><b> National Day</b>';
-              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+
+        hksar.forEach(function (date) {
+          if (colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '<img src="{% static 'nightwork/hongkong.png' %}"><b> HKSAR Day</b>';
+            $("[data-date='" + colDate.getFullYear() + "-" + ("0"+(colDate.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(colDate.getDate()).toString()).slice(-2) + "']").removeClass("fc-frozen").addClass("fc-holiday");
           }
         });
-        midautumn.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🌕 <b>Mid Autumn</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+
+        china.forEach(function (date) {
+          if (colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '<img src="{% static 'nightwork/china.png' %}"><b> National Day</b>';
+            $("[data-date='" + colDate.getFullYear() + "-" + ("0"+(colDate.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(colDate.getDate()).toString()).slice(-2) + "']").removeClass("fc-frozen").addClass("fc-holiday");
           }
         });
-        chungyeung.forEach((date) => {
-        if (colDate.getYear() === date.getYear() &&
-            colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '💐 <b>Chung Yeung</b>';
-              $("[data-date='" + date.getFullYear() + "-" + (date.getMonth()+1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0") + "']").addClass("fc-holiday")
+
+        midautumn.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🌕 <b>Mid Autumn</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-holiday");
           }
         });
-        christmas.forEach((date) => {
-        if (colDate.getMonth() === date.getMonth() &&
-            colDate.getDate() === date.getDate())  {
-              info.el.innerHTML = '🎅 <b>Christmas</b>';
-              $("[data-date='" + colDate.getFullYear() + "-" + (colDate.getMonth()+1).toString().padStart(2, "0") + "-" + colDate.getDate().toString().padStart(2, "0") + "']").removeClass("fc-frozen").addClass("fc-holiday")
+
+        chungyeung.forEach(function (date) {
+          if (colDate.getYear() === date.getYear() && colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '💐 <b>Chung Yeung</b>';
+            $("[data-date='" + date.getFullYear() + "-" + ("0"+(date.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(date.getDate()).toString()).slice(-2) + "']").addClass("fc-holiday");
+          }
+        });
+
+        christmas.forEach(function (date) {
+          if (colDate.getMonth() === date.getMonth() && colDate.getDate() === date.getDate()) {
+            info.el.innerHTML = '🎅 <b>Christmas</b>';
+            $("[data-date='" + colDate.getFullYear() + "-" + ("0"+(colDate.getMonth() + 1).toString()).slice(-2) + "-" + ("0"+(colDate.getDate()).toString()).slice(-2) + "']").removeClass("fc-frozen").addClass("fc-holiday");
           }
         });
       },
     });
     calendar.render();
-
   </script>
 
  <div id="fullCalModal" class="modal fade" tabindex="-1" role="dialog">

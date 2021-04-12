@@ -25,7 +25,7 @@ SECRET_KEY = '#3v8@h(-x5x=**+b8ok*%2n!+cjs64a&ftst@f$q@su74f##yj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','44.226.84.74']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'nightwork.wsgi.application'
 DATABASES = {
             'default': {
                         'ENGINE': 'django.db.backends.mysql',
-                        'NAME': 'my_db',
+                        'NAME': 'k8s_nightwork',
                         'USER': os.getenv('DATABASE_USER'),
                         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
                         'HOST': os.getenv('DATABASE_HOST'),
