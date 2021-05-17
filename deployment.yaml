@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-deployment-new
+  namespace: nightjob
   labels:
     app: be
 spec:
@@ -16,14 +17,21 @@ spec:
     spec:
       containers:
         - name: appjarcont
-          image: kubernetes-django:1.0.2
+          image: stephin2020/kubernetes-django-nightjob:1.0.3
+          imagePullPolicy: Always
           env:
             - name: DATABASE_HOST
               value: "mysql"
             - name: DATABASE_USER
-              value: "root"
+              valueFrom:
+                secretKeyRef:
+                  name: db-user
+                  key: username
             - name: DATABASE_PASSWORD
-              value: "root"
+              valueFrom:
+                secretKeyRef:
+                  name: db-user
+                  key: password
             - name: DATABASE_PORT
               value: "3306"
           ports:
@@ -34,12 +42,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: websvc
+  namespace: nightjob
+  annotations:
+    metallb.universe.tf/address-pool: gnc-stephen-ip
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: be
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8000
-      nodePort: 30001
